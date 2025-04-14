@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace EvoMark\EvoLaravelSortableTreeview;
 
-class SortableTreeviewProvider
+use Illuminate\Support\ServiceProvider;
+
+class SortableTreeviewProvider extends ServiceProvider
 {
     public function boot()
     {
