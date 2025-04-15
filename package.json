@@ -1,20 +1,21 @@
 {
-    "name": "evo-laravel-sortable-treeview",
-    "version": "1.0.0",
-    "description": "",
-    "main": "resources/index.js",
-    "module": "resources/index.js",
-    "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "dependencies": {},
-    "peerDependencies": {
-        "vue-draggable-plus": "^0.6.0",
-        "vue": "^3.0.0",
-        "vuetify": "^3.3.19"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC"
+	"name": "evo-laravel-sortable-treeview",
+	"version": "1.0.0",
+	"description": "",
+	"main": "resources/index.js",
+	"module": "resources/index.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {},
+	"peerDependencies": {
+		"vue-draggable-plus": "^0.6.0",
+		"vue": "^3.0.0",
+		"@evomark/vue-forward-slots": "^6.2.0",
+		"vuetify": "^3.3.19"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
 }
