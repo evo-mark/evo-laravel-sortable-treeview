@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EvoMark\EvoLaravelSortableTreeview\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
 
@@ -24,8 +25,7 @@ trait SortableTreeController
             'model_id' => ['required']
         ]);
 
-        $modelClass = base64_decode($validated['model']);
-        $model = $modelClass::find($validated['model_id']);
+        $model = $this->getTreeviewModelInstance($validated);
 
         $model->load(['directDescendants' => function ($subquery) {
             $subquery->orderBy('sort_order')->withCount('directDescendants');
@@ -36,17 +36,26 @@ trait SortableTreeController
         ]);
     }
 
+    private function getTreeviewModelInstance(array $data): Model
+    {
+        $modelClass = base64_decode($data['model']);
+        return $modelClass::find($data['model_id']);
+    }
+
     public function updateTreeviewSortOrder(Request $request)
     {
         $validated = $request->validate([
-            'parentId' => ['nullable', 'integer', 'exists:categories,id'],
+            'model' => ['required', 'string'],
+            'parent_id' => ['nullable', 'integer'],
             'ids' => ['nullable', 'array'],
-            'ids.*' => ['required', 'integer', 'exists:categories,id'],
+            'ids.*' => ['required', 'integer'],
         ]);
 
-        $parentId = $validated['parentId'] ?? null;
+        $modelClass = base64_decode($validated['model']);
+
+        $parentId = $validated['parent_id'] ?? null;
         foreach ($validated['ids'] as $index => $id) {
-            Category::where('id', $id)->update([
+            $modelClass::where('id', $id)->update([
                 'parent_id' => $parentId,
                 'sort_order' => $index + 1,
             ]);
@@ -54,6 +63,6 @@ trait SortableTreeController
 
         Cache::flush();
 
-        return $this->respondSuccess();
+        return response()->json([]);
     }
 }

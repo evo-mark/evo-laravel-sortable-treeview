@@ -1,34 +1,56 @@
 <template>
 	<li class="evo-sortable-treeview__item">
-		<div class="evo-sortable-treeview__actions">
+		<div class="evo-sortable-treeview__item-content">
+			<div ref="item" class="evo-sortable-treeview__actions">
+				<div
+					class="evo-sortable-treeview__action-expand"
+					:class="{
+						'is-expanded': isExpanded
+					}"
+				>
+					<VBtn
+						v-if="hasChildren"
+						icon
+						variant="flat"
+						size="small"
+						:loading="isLoadingChildren"
+						@click="onExpandToggle"
+					>
+						<SvgIcon
+							class="evo-sortable-treeview__expand-icon"
+							size="24"
+							:path="mdiChevronRight"
+							:rotate="isExpanded ? 90 : 0"
+						/>
+					</VBtn>
+				</div>
+				<div class="evo-sortable-treeview__action-drag">
+					<VBtn variant="plain" size="small" class="drag-handle cursor-move">
+						<SvgIcon :path="mdiDragVertical" />
+					</VBtn>
+				</div>
+				<div class="evo-sortable-treeview__action-title">
+					<slot name="item.title" :item="props.item" :title="props.item[itemTitle]">
+						{{ props.item[itemTitle] }}
+					</slot>
+				</div>
+			</div>
+			<div class="evo-sortable-treeview__spacer"></div>
 			<div
-				class="evo-sortable-treeview__action-expand"
-				:class="{
-					'is-expanded': isExpanded,
+				class="evo-sortable-treeview__columns"
+				:style="{
+					'--max-actions-width': `${context.actionsWidth.value}px`,
+					'--max-columns-width': `${context.columnsWidth.value}px`
 				}"
 			>
-				<VBtn
-					v-if="hasChildren"
-					icon
-					variant="flat"
-					size="small"
-					:loading="isLoadingChildren"
-					@click="onExpandToggle"
-				>
-					<VIcon size="24" :icon="mdiChevronRight" />
-				</VBtn>
-			</div>
-			<div class="evo-sortable-treeview__action-drag"></div>
-			<div class="evo-sortable-treeview__action-title">
-				<slot name="item" :item="props.item" :title="props.item[itemTitle]">
-					{{ props.item[itemTitle] }}
-				</slot>
+				<slot name="item.columns" :item="props.item"></slot>
 			</div>
 		</div>
 		<ForwardSlots :slots="$slots">
 			<SortableTreeviewChildren
 				v-model="_children"
 				:is-expanded="isExpanded"
+				:is-empty="!hasChildren"
 				:depth="props.depth + 1"
 				:parent-id="props.item[itemValue]"
 			></SortableTreeviewChildren>
@@ -37,50 +59,54 @@
 </template>
 
 <script setup>
-import { syncRef } from "@vueuse/core";
+import { useId } from "vue";
+import { syncRef, useElementSize } from "@vueuse/core";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
-import { mdiChevronRight } from "@mdi/js";
+import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
 import { SORTABLE_TREEVIEW } from "./keys";
+import SvgIcon from "vue3-icon";
 
 defineOptions({
-	name: "EvoSortableTreeviewItem",
+	name: "EvoSortableTreeviewItem"
 });
 
 const props = defineProps({
 	item: {
 		type: Object,
-		required: true,
+		required: true
 	},
 	depth: {
 		type: Number,
-		required: true,
-	},
+		required: true
+	}
 });
 
+const id = useId();
+const itemRef = useTemplateRef("item");
 const context = inject(SORTABLE_TREEVIEW);
 const itemTitle = computed(() => context.config.value.itemTitle);
 const itemValue = computed(() => context.config.value.itemValue);
 const itemChildren = computed(() => context.config.value.itemChildren);
 const itemChildrenCount = computed(() => context.config.value.itemChildrenCount);
 
+const _children = ref([]);
 const hasChildren = computed(() => {
-	if (props.item[itemChildrenCount.value] > 0)
-		return true; // Lazy
+	if (props.item[itemChildrenCount.value] > 0) return true; // Lazy
+	else if (_children.value?.length) return true; // Loaded
 	else if (Array.isArray(props.item[itemChildren.value]) && props.item[itemChildren.value]?.length > 0)
 		return true; // Eager
 	else return false; // None
 });
 const isLoadingChildren = ref(false);
-const _children = ref([]);
-const stopSyncChildren = syncRef(() => props.item[itemChildren.value], _children, {
+syncRef(() => props.item[itemChildren.value], _children, {
 	direction: "ltr",
 	transform: {
 		ltr: (left) => {
 			return left;
-		},
+		}
 	},
-	immediate: true,
+	immediate: true
 });
 const childrenLoaded = computed(() => hasChildren.value && _children.value?.length > 0);
 
@@ -103,10 +129,27 @@ const onExpandToggle = () => {
 			isLoadingChildren.value = false;
 		});
 };
+
+/* *********************************************
+ * Register
+ * ******************************************* */
+const { width } = useElementSize(itemRef);
+watch(itemRef, (v) => {
+	if (v) context.registerItem(id, width);
+});
+onUnmounted(() => context.unregisterItem(id));
 </script>
 
 <style>
+.evo-sortable-treeview__item {
+	border: 1px solid red;
+}
+.evo-sortable-treeview__item-content {
+	display: flex;
+	align-items: center;
+}
 .evo-sortable-treeview__actions {
+	min-height: 40px;
 	display: flex;
 	align-items: center;
 }
@@ -120,5 +163,22 @@ const onExpandToggle = () => {
 	&.is-expanded .v-icon__svg {
 		transform: rotate(90deg);
 	}
+}
+
+.evo-sortable-treeview__action-title {
+	white-space: nowrap;
+	padding-right: 3rem;
+}
+
+.evo-sortable-treeview__columns {
+	width: var(--max-columns-width);
+}
+
+.evo-sortable-treeview__expand-icon {
+	transition: transform 150ms ease-in-out;
+}
+
+.evo-sortable-treeview__spacer {
+	flex-grow: 1;
 }
 </style>

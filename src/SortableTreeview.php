@@ -46,7 +46,7 @@ class SortableTreeview
         [$cls] = explode('@', Route::currentRouteAction());
 
         if (in_array(SortableTreeController::class, class_uses($cls)) === false) {
-            throw new Exception($cls . " is not using the SortableTreeModel trait");
+            throw new Exception($cls . " is not using the SortableTreeController trait");
         }
 
         $instance = app($cls);
@@ -92,6 +92,8 @@ class SortableTreeview
         $config['itemValue'] ??= "id";
         $config['loadChildrenRoute'] ??= "";
         $config['loadChildrenMethod'] ??= "get";
+        $config['updateSortOrderRoute'] ??= "";
+        $config['updateSortOrderMethod'] ??= "put";
 
         $this->config = $config;
 
