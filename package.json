@@ -1,6 +1,6 @@
 {
 	"name": "evo-laravel-sortable-treeview",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "",
 	"main": "resources/index.js",
 	"module": "resources/index.js",
