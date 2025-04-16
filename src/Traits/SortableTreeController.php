@@ -11,12 +11,6 @@ use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
 
 trait SortableTreeController
 {
-    protected string $treeviewModel = "";
-
-    public function setTreeviewModel(string $model)
-    {
-        $this->treeviewModel = $model;
-    }
 
     public function loadTreeviewChildren(Request $request)
     {
@@ -50,6 +44,7 @@ trait SortableTreeController
             'ids' => ['nullable', 'array'],
             'ids.*' => ['required', 'integer'],
         ]);
+
 
         $modelClass = base64_decode($validated['model']);
 

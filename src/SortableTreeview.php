@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace EvoMark\EvoLaravelSortableTreeview;
 
+use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
+use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeController;
+use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeModel;
 use Exception;
-use TypeError;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
-use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeModel;
-use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeController;
+use TypeError;
 
 class SortableTreeview
 {
@@ -36,21 +37,8 @@ class SortableTreeview
     public static function for(string $model): static
     {
         static::validateModel($model);
-        static::validateController($model);
 
         return new static($model);
-    }
-
-    public static function validateController(string $model): void
-    {
-        [$cls] = explode('@', Route::currentRouteAction());
-
-        if (in_array(SortableTreeController::class, class_uses($cls)) === false) {
-            throw new Exception($cls . " is not using the SortableTreeController trait");
-        }
-
-        $instance = app($cls);
-        $instance->setTreeviewModel($model);
     }
 
     public static function validateModel(string $model): void
@@ -84,15 +72,17 @@ class SortableTreeview
 
     public function setConfig(array $config): static
     {
+        $routePrefix = Str::wrap(config('sortable-treeview.route-prefix'), '/');
+
         $config['lazy'] ??= false;
         $config['maxDepth'] ??= null;
         $config['itemChildren'] ??= "children";
         $config['itemChildrenCount'] ??= "children_count";
         $config['itemTitle'] ??= "title";
         $config['itemValue'] ??= "id";
-        $config['loadChildrenRoute'] ??= "";
+        $config['loadChildrenRoute'] ??= $routePrefix . "lazy";
         $config['loadChildrenMethod'] ??= "get";
-        $config['updateSortOrderRoute'] ??= "";
+        $config['updateSortOrderRoute'] ??= $routePrefix . "sort";
         $config['updateSortOrderMethod'] ??= "put";
 
         $this->config = $config;

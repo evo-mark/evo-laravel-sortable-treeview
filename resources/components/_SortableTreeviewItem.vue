@@ -36,13 +36,7 @@
 				</div>
 			</div>
 			<div class="evo-sortable-treeview__spacer"></div>
-			<div
-				class="evo-sortable-treeview__columns"
-				:style="{
-					'--max-actions-width': `${context.actionsWidth.value}px`,
-					'--max-columns-width': `${context.columnsWidth.value}px`
-				}"
-			>
+			<div class="evo-sortable-treeview__columns">
 				<slot name="item.columns" :item="props.item"></slot>
 			</div>
 		</div>
@@ -116,33 +110,23 @@ const childrenLoaded = computed(() => hasChildren.value && _children.value?.leng
 
 const isExpanded = ref(false);
 const onExpandToggle = () => {
-	isExpanded.value = !isExpanded.value;
-	if (!isExpanded.value || childrenLoaded.value) return; // Children already loaded
+	if (isExpanded.value || childrenLoaded.value) return (isExpanded.value = !isExpanded.value); // Children already loaded
 
 	isLoadingChildren.value = true;
 	context
 		.onLoadChildren(props.item)
 		.then((res) => {
 			_children.value = res.data.children ?? [];
+			isExpanded.value = !isExpanded.value;
 		})
 		.finally(() => {
 			isLoadingChildren.value = false;
 		});
 };
-
-/* *********************************************
- * Register
- * ******************************************* */
-const { width } = useElementSize(itemRef);
-watch(itemRef, (v) => {
-	if (v) context.registerItem(id, width);
-});
-onUnmounted(() => context.unregisterItem(id));
 </script>
 
 <style>
 .evo-sortable-treeview__item {
-	border: 1px solid red;
 }
 .evo-sortable-treeview__item-content {
 	display: flex;
@@ -171,7 +155,7 @@ onUnmounted(() => context.unregisterItem(id));
 }
 
 .evo-sortable-treeview__columns {
-	width: var(--max-columns-width);
+	padding-right: 0.5rem;
 }
 
 .evo-sortable-treeview__expand-icon {
