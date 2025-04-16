@@ -2,7 +2,7 @@
     "name": "evo-mark/evo-laravel-sortable-treeview",
     "description": "Sortable Treeview Laravel/Inertia websites",
     "type": "library",
-    "license": "Proprietary",
+    "license": "BUSL-1.1",
     "authors": [
         {
             "name": "Craig Riley",
