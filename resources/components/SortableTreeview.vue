@@ -3,7 +3,7 @@
 		<header
 			class="evo-sortable-treeview__header"
 			:style="{
-				'--max-columns-width': `${maxColumnsWidth}px`
+				'--max-columns-width': `${maxColumnsWidth}px`,
 			}"
 		>
 			<slot name="header"></slot>
@@ -18,14 +18,14 @@
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { useElementSize } from "@vueuse/core";
-import { usePage, router } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { useId, provide } from "vue";
 import { SORTABLE_TREEVIEW } from "./keys";
-import { pick, debounce } from "lodash-es";
+import { pick } from "lodash-es";
 import axios from "axios";
 
 defineOptions({
-	name: "EvoSortableTreeview"
+	name: "EvoSortableTreeview",
 });
 
 const id = useId();
@@ -34,14 +34,14 @@ const emit = defineEmits(["sorted"]);
 const props = defineProps({
 	model: {
 		type: [String, Object],
-		required: true
-	}
+		required: true,
+	},
 });
 const treeviewRef = useTemplateRef("treeview");
 const { width: treeviewWidth } = useElementSize(treeviewRef);
 
 const modelObject = computed(() => (typeof props.model === "string" ? usePage().props[props.model] : props.model));
-const config = computed(() => modelObject.value.config);
+const config = computed(() => modelObject.value?.config ?? {});
 const modelData = computed(() => modelObject.value?.data ?? modelObject.value);
 const modelValue = ref(modelData.value);
 watch(modelData, (data) => {
@@ -54,15 +54,15 @@ const maxActionsWidth = computed(() => {
 		Math.max(
 			...Array.from(actionsWidth.value.values()).map((width) => {
 				return width.value ?? 0;
-			})
-		)
+			}),
+		),
 	);
 });
 const maxColumnsWidth = computed(() => {
 	return treeviewWidth.value - maxActionsWidth.value;
 });
 
-const refresh = debounce(() => {
+/* const refresh = debounce(() => {
 	router.reload({
 		only: [props.model],
 		async: true,
@@ -70,9 +70,9 @@ const refresh = debounce(() => {
 		preserveState: true,
 		onSuccess() {
 			modelValue.value = modelData.value;
-		}
+		},
 	});
-}, 100);
+}, 100); */
 
 provide(SORTABLE_TREEVIEW, {
 	group: id,
@@ -82,15 +82,20 @@ provide(SORTABLE_TREEVIEW, {
 	treeProps: computed(() => pick(props, ["itemChildren", "itemChildrenCount", "itemTitle", "itemValue"])),
 	onSorted: ($event, parentId) => {
 		const ids = $event.map((item) => item[config.value.itemValue]) ?? [];
+		emit("sorted", {
+			parentId,
+			ids,
+			$event,
+		});
 		return axios({
 			url: config.value.updateSortOrderRoute,
 			method: config.value.updateSortOrderMethod,
 			data: {
 				model: modelObject.value.modelClass,
 				parent_id: parentId,
-				ids
+				ids,
 			},
-			responseType: "json"
+			responseType: "json",
 		});
 	},
 	onLoadChildren: (item) => {
@@ -99,8 +104,8 @@ provide(SORTABLE_TREEVIEW, {
 			method: config.value.loadChildrenMethod,
 			params: {
 				model: modelObject.value.modelClass,
-				model_id: item[config.value.itemValue]
-			}
+				model_id: item[config.value.itemValue],
+			},
 		});
 	},
 	registerItem: (nodeId, width) => {
@@ -108,7 +113,7 @@ provide(SORTABLE_TREEVIEW, {
 	},
 	unregisterItem: (nodeId) => {
 		actionsWidth.value.delete(nodeId);
-	}
+	},
 });
 </script>
 
