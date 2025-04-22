@@ -54,7 +54,7 @@
 
 <script setup>
 import { useId } from "vue";
-import { syncRef, useElementSize } from "@vueuse/core";
+import { syncRef  } from "@vueuse/core";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
