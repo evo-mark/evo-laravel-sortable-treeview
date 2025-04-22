@@ -35,8 +35,7 @@
 					</slot>
 				</div>
 			</div>
-			<div class="evo-sortable-treeview__spacer"></div>
-			<div class="evo-sortable-treeview__columns">
+			<div class="d-flex align-center" ref="columns">
 				<slot name="item.columns" :item="props.item"></slot>
 			</div>
 		</div>
@@ -53,13 +52,14 @@
 </template>
 
 <script setup>
-import { useId } from "vue";
-import { syncRef  } from "@vueuse/core";
+import { useId, inject, nextTick } from "vue";
+import { syncRef } from "@vueuse/core";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
 import { SORTABLE_TREEVIEW } from "./keys";
 import SvgIcon from "vue3-icon";
+import { useElementSize } from "@vueuse/core";
 
 defineOptions({
 	name: "EvoSortableTreeviewItem"
@@ -77,12 +77,34 @@ const props = defineProps({
 });
 
 const id = useId();
-const itemRef = useTemplateRef("item");
+const columnsRef = useTemplateRef("columns");
 const context = inject(SORTABLE_TREEVIEW);
 const itemTitle = computed(() => context.config.value.itemTitle);
 const itemValue = computed(() => context.config.value.itemValue);
 const itemChildren = computed(() => context.config.value.itemChildren);
 const itemChildrenCount = computed(() => context.config.value.itemChildrenCount);
+
+/* *********************************************************
+ * WIDTH
+ ********************************************************* */
+const columnWidths = ref([]);
+const { width: columsContainerWidth } = useElementSize(columnsRef);
+
+watch(
+	columsContainerWidth,
+	(v) => {
+		if (!columnsRef.value) return [];
+		columnWidths.value = Array.from(columnsRef.value?.children).map((el) => {
+			const { width } = el.getBoundingClientRect();
+			return width;
+		});
+	},
+	{
+		immediate: true
+	}
+);
+const { registerItem } = inject(SORTABLE_TREEVIEW);
+registerItem(id, columnWidths);
 
 const _children = ref([]);
 const hasChildren = computed(() => {
@@ -131,6 +153,8 @@ const onExpandToggle = () => {
 .evo-sortable-treeview__item-content {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
+	padding-right: 0.5rem;
 }
 .evo-sortable-treeview__actions {
 	min-height: 40px;
@@ -152,10 +176,6 @@ const onExpandToggle = () => {
 .evo-sortable-treeview__action-title {
 	white-space: nowrap;
 	padding-right: 3rem;
-}
-
-.evo-sortable-treeview__columns {
-	padding-right: 0.5rem;
 }
 
 .evo-sortable-treeview__expand-icon {

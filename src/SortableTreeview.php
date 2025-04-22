@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace EvoMark\EvoLaravelSortableTreeview;
 
-use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
-use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeController;
-use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeModel;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use TypeError;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Macroable;
+use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeModel;
+use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
 
 class SortableTreeview
 {
@@ -104,6 +102,11 @@ class SortableTreeview
         return $this;
     }
 
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
     public function get()
     {
         $query = $this->model::root();
@@ -118,7 +121,8 @@ class SortableTreeview
 
         return $collection->additional([
             'config' => $this->config,
-            'modelClass' => base64_encode($this->model)
+            'modelClass' => base64_encode($this->model),
+            'headers' => $this->getHeaders()
         ]);
     }
 }
