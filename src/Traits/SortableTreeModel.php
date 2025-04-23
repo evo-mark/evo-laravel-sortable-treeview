@@ -6,6 +6,7 @@ namespace EvoMark\EvoLaravelSortableTreeview\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait SortableTreeModel
 {
@@ -30,5 +31,10 @@ trait SortableTreeModel
     public function scopeRoot(): Builder
     {
         return $this->whereNull('parent_id');
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'parent_id', 'id');
     }
 }

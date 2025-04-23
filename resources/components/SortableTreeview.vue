@@ -35,7 +35,7 @@ defineOptions({
 
 const id = useId();
 
-const emit = defineEmits(["sorted"]);
+const emit = defineEmits(["sorted", "updated", "error"]);
 const props = defineProps({
 	model: {
 		type: [String, Object],
@@ -75,6 +75,9 @@ provide(SORTABLE_TREEVIEW, {
 	treeProps: computed(() => pick(props, ["itemChildren", "itemChildrenCount", "itemTitle", "itemValue"])),
 	registerItem: (id, widthsReactive) => {
 		itemWidths.value.set(id, widthsReactive);
+	},
+	emit(key, payload) {
+		emit(key, payload);
 	},
 	onSorted: ($event, parentId) => {
 		const ids = $event.map((item) => item[config.value.itemValue]) ?? [];

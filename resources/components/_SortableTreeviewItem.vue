@@ -36,7 +36,7 @@
 				</div>
 			</div>
 			<div class="d-flex align-center" ref="columns">
-				<slot name="item.columns" :item="props.item"></slot>
+				<slot name="item.columns" :item="data"></slot>
 			</div>
 		</div>
 		<ForwardSlots :slots="$slots">
@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { useId, inject, nextTick } from "vue";
+import { useId, inject } from "vue";
 import { syncRef } from "@vueuse/core";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
@@ -60,6 +60,7 @@ import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
 import { SORTABLE_TREEVIEW } from "./keys";
 import SvgIcon from "vue3-icon";
 import { useElementSize } from "@vueuse/core";
+import { useApiSync } from "../composables/useApiSync";
 
 defineOptions({
 	name: "EvoSortableTreeviewItem"
@@ -83,6 +84,19 @@ const itemTitle = computed(() => context.config.value.itemTitle);
 const itemValue = computed(() => context.config.value.itemValue);
 const itemChildren = computed(() => context.config.value.itemChildren);
 const itemChildrenCount = computed(() => context.config.value.itemChildrenCount);
+
+/* *********************************************************
+ * ITEM UPDATE
+ ********************************************************* */
+const { data, error } = useApiSync(() => props.item, {
+	...context.config.value,
+	onSuccess: (data) => {
+		context.emit("updated", data);
+	},
+	onError: (data) => {
+		context.emit("error", data);
+	}
+});
 
 /* *********************************************************
  * WIDTH
@@ -119,6 +133,7 @@ syncRef(() => props.item[itemChildren.value], _children, {
 	direction: "ltr",
 	transform: {
 		ltr: (left) => {
+			// TODO: Logic here to preserve loaded children when page props are reloaded
 			return left;
 		}
 	},

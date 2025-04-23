@@ -82,6 +82,8 @@ class SortableTreeview
         $config['loadChildrenMethod'] ??= "get";
         $config['updateSortOrderRoute'] ??= $routePrefix . "sort";
         $config['updateSortOrderMethod'] ??= "put";
+        $config['updateItemRoute'] ??= "";
+        $config['updateItemMethod'] ??= "PATCH";
 
         $this->config = $config;
 
