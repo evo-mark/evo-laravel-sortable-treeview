@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { useId, inject } from "vue";
+import { useId, inject, useTemplateRef, computed, ref, watch } from "vue";
 import { syncRef } from "@vueuse/core";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { ForwardSlots } from "@evomark/vue-forward-slots";

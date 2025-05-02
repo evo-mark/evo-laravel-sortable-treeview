@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import SortableTreeviewItem from "./_SortableTreeviewItem.vue";
 import { SORTABLE_TREEVIEW } from "./keys";
