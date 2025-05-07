@@ -50,7 +50,8 @@ trait SortableTreeController
 
         $parentId = $validated['parent_id'] ?? null;
         foreach ($validated['ids'] as $index => $id) {
-            $modelClass::where('id', $id)->update([
+            $model = $modelClass::find($id);
+            $model->update([
                 'parent_id' => $parentId,
                 'sort_order' => $index + 1,
             ]);
