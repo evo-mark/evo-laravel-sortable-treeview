@@ -1,6 +1,5 @@
 {
     "name": "evo-mark/evo-laravel-sortable-treeview",
-    "version": "1.0.5",
     "description": "Sortable Treeview Laravel/Inertia websites",
     "type": "library",
     "license": "BUSL-1.1",
