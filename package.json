@@ -1,6 +1,6 @@
 {
 	"name": "evo-laravel-sortable-treeview",
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"description": "",
 	"main": "dist/evo-laravel-sortable-treeview.cjs",
 	"module": "dist/evo-laravel-sortable-treeview.js",
@@ -23,7 +23,8 @@
 	"devDependencies": {
 		"@mdi/js": "^7.4.47",
 		"@vitejs/plugin-vue": "^5.2.3",
-		"vite": "^6.3.2",
+		"@vueuse/core": "^13.1.0",
+		"vite": "^6.3.5",
 		"vite-plugin-lib-inject-css": "^2.2.2"
 	}
 }
