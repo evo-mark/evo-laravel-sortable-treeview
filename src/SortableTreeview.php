@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Database\Eloquent\Builder;
 use EvoMark\EvoLaravelSortableTreeview\Traits\SortableTreeModel;
 use EvoMark\EvoLaravelSortableTreeview\SortableTreeviewResource;
 
@@ -19,6 +20,7 @@ class SortableTreeview
 
     protected array $config;
     protected array $headers;
+    protected Builder $query;
 
     /**
      * @var string When returning treeview results, use this as a collection resource
@@ -68,6 +70,13 @@ class SortableTreeview
         }
     }
 
+    public function setQuery(Builder $query): static
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
     public function setConfig(array $config): static
     {
         $routePrefix = Str::wrap(config('sortable-treeview.route-prefix'), '/');
@@ -111,14 +120,15 @@ class SortableTreeview
 
     public function get()
     {
-        $query = $this->model::root();
+        $query = !empty($this->query) ? $this->query->root() : $this->model::root();
+
         if ($this->config['lazy'] === true) {
             $query->withCount("directDescendants");
         } else {
             $query->with('descendants');
         }
-        $results = $query->get();
 
+        $results = $query->orderBy('sort_order')->get();
         $collection = $this->collection::collection($results);
 
         return $collection->additional([
