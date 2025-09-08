@@ -5,7 +5,7 @@
 				<div
 					class="evo-sortable-treeview__action-expand"
 					:class="{
-						'is-expanded': isExpanded
+						'is-expanded': isExpanded,
 					}"
 				>
 					<VBtn
@@ -30,12 +30,14 @@
 					</VBtn>
 				</div>
 				<div class="evo-sortable-treeview__action-title">
+					<slot name="item.prepend-title" :item="props.item"></slot>
 					<slot name="item.title" :item="props.item" :title="props.item[itemTitle]">
 						{{ props.item[itemTitle] }}
 					</slot>
+					<slot name="item.append-title" :item="props.item"></slot>
 				</div>
 			</div>
-			<div class="d-flex align-center" ref="columns">
+			<div class="d-flex align-center flex" ref="columns">
 				<slot name="item.columns" :item="data"></slot>
 			</div>
 		</div>
@@ -63,18 +65,18 @@ import { useElementSize } from "@vueuse/core";
 import { useApiSync } from "../composables/useApiSync";
 
 defineOptions({
-	name: "EvoSortableTreeviewItem"
+	name: "EvoSortableTreeviewItem",
 });
 
 const props = defineProps({
 	item: {
 		type: Object,
-		required: true
+		required: true,
 	},
 	depth: {
 		type: Number,
-		required: true
-	}
+		required: true,
+	},
 });
 
 const id = useId();
@@ -95,7 +97,7 @@ const { data, error } = useApiSync(() => props.item, {
 	},
 	onError: (data) => {
 		context.emit("error", data);
-	}
+	},
 });
 
 /* *********************************************************
@@ -114,16 +116,18 @@ watch(
 		});
 	},
 	{
-		immediate: true
-	}
+		immediate: true,
+	},
 );
 const { registerItem } = inject(SORTABLE_TREEVIEW);
 registerItem(id, columnWidths);
 
 const _children = ref([]);
 const hasChildren = computed(() => {
-	if (props.item[itemChildrenCount.value] > 0) return true; // Lazy
-	else if (_children.value?.length) return true; // Loaded
+	if (props.item[itemChildrenCount.value] > 0)
+		return true; // Lazy
+	else if (_children.value?.length)
+		return true; // Loaded
 	else if (Array.isArray(props.item[itemChildren.value]) && props.item[itemChildren.value]?.length > 0)
 		return true; // Eager
 	else return false; // None
@@ -135,9 +139,9 @@ syncRef(() => props.item[itemChildren.value], _children, {
 		ltr: (left) => {
 			// TODO: Logic here to preserve loaded children when page props are reloaded
 			return left;
-		}
+		},
 	},
-	immediate: true
+	immediate: true,
 });
 const childrenLoaded = computed(() => hasChildren.value && _children.value?.length > 0);
 
