@@ -10,7 +10,7 @@ export default defineConfig({
 			formats: ["es", "cjs"]
 		},
 		rollupOptions: {
-			external: ["vue", "@evomark/vue-forward-slots", "@inertiajs/vue3", "lodash-es", "axios", "@vueuse/core"]
+			external: ["vue","vuetify", "@evomark/vue-forward-slots", "@inertiajs/vue3", "lodash-es", "axios", "@vueuse/core"]
 		}
 	}
 });

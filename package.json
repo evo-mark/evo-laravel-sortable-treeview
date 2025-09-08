@@ -3,7 +3,7 @@
 	"version": "1.0.5",
 	"description": "",
 	"main": "dist/evo-laravel-sortable-treeview.cjs",
-	"module": "dist/evo-laravel-sortable-treeview.js",
+	"module": "resources/index.js",
 	"type": "module",
 	"scripts": {
 		"build": "vite build"
@@ -15,7 +15,8 @@
 		"axios": "^1.8.0",
 		"lodash-es": "^4.0.0",
 		"vue-draggable-plus": "^0.6.0",
-		"vue3-icon": "^3.0.0"
+		"vue3-icon": "^3.0.0",
+		"vuetify": "^3.9.0"
 	},
 	"keywords": [],
 	"author": "",

@@ -5,6 +5,7 @@
 				<div
 					v-for="(header, index) in headers"
 					:key="header.value"
+					class="evo-sortable-treeview__header--text"
 					:style="{
 						width: `${columnMaximums[index]}px`,
 						textAlign: header.align ?? 'left'
@@ -121,5 +122,8 @@ provide(SORTABLE_TREEVIEW, {
 	display: flex;
 	justify-content: flex-end;
 	padding-right: 0.5rem;
+}
+.evo-sortable-treeview__header--text {
+	white-space: nowrap;
 }
 </style>
