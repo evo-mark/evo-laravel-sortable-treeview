@@ -1,0 +1,124 @@
+name: release
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    check_tag:
+      runs-on: ubuntu-latest
+      permissions:
+          contents: write
+      steps:
+          - uses: actions/checkout@v4
+            with:
+                fetch-depth: "0"
+
+          - name: Bump version and push tag
+            id: check_tag
+            uses: anothrNick/github-tag-action@1.71.0
+            env:
+                WITH_V: true
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                DEFAULT_BUMP: none
+                RELEASE_BRANCHES: main
+                DRY_RUN: true
+
+      outputs:
+          bump: ${{ steps.check_tag.outputs.part }}
+          new_tag: ${{ steps.check_tag.outputs.new_tag }}
+
+    write_version:
+      runs-on: ubuntu-latest
+      needs: check_tag
+      if: needs.check_tag.outputs.bump != '' && needs.check_tag.outputs.bump != 'none'
+      permissions:
+            contents: write
+      steps:
+          - uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+
+          - name: Install JQ
+            run: sudo apt-get install -y jq
+
+          - name: Bump package.json version
+            run: |
+                VERSION="${{ needs.check_tag.outputs.new_tag }}"
+                jq ".version=\"${VERSION:1}\"" ./package.json > ./package.tmp.json --tab
+                mv ./package.tmp.json ./package.json
+
+          - name: Bump composer.json version
+            run: |
+                VERSION="${{ needs.check_tag.outputs.new_tag }}"
+                jq ".version=\"${VERSION:1}\"" ./composer.json > ./composer.tmp.json --tab
+                mv ./composer.tmp.json ./composer.json
+
+          - uses: pnpm/action-setup@v4
+            with:
+              run_install: false
+
+          - name: Install Node.js
+            uses: actions/setup-node@v4
+            with:
+              node-version: 22
+              cache: 'pnpm'
+
+          - name: Install dependencies
+            run: |
+              pnpm install
+              pnpm run build
+
+          - name: Commit changes to package.json version and changelog folder
+            continue-on-error: true
+            run: |
+                git config --global user.email  "github@evomark.co.uk"
+                git config --global user.name  "evoMark Action"
+                git add .
+                git commit -m "Update version for release"
+
+          - name: Tag new version
+            run: |
+              VERSION="${{ needs.check_tag.outputs.new_tag }}"
+              git tag "$VERSION"
+              git push
+              git push origin "$VERSION"
+
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        needs: [write_version,check_tag]
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: "0"
+
+            - name: Get previous tag
+              id: prev_tag
+              run: |
+                    TAG=$(git tag --sort=-creatordate | grep '^v' | grep -v "${{ needs.check_tag.outputs.new_tag }}" | head -n 1)
+                    echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+            - name: Get commit messages since last tag
+              id: changelog
+              run: |
+                log=$(git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"%s" | grep -v "Update version for release")
+                # Strip #patch, #minor, and #major
+                cleaned_log=$(echo "$log" | sed -E 's/\s*(#patch|#minor|#major)\b//g')
+                echo "log<<EOF" >> $GITHUB_OUTPUT
+                echo "$cleaned_log" >> $GITHUB_OUTPUT
+                echo "EOF" >> $GITHUB_OUTPUT
+
+            - name: Create Github release
+              id: create_release
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ needs.check_tag.outputs.new_tag }}
+                  name: Release ${{ needs.check_tag.outputs.new_tag }}
+                  body: ${{ steps.changelog.outputs.log }}
+                  draft: false
+                  prerelease: false
