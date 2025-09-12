@@ -4,7 +4,7 @@ import axios from "axios";
 import { cloneDeep, isEqual, pick, reduce } from "lodash-es";
 import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { usePage } from "@inertiajs/vue3";
-import './index.css';const SORTABLE_TREEVIEW = Symbol.for("sortable-treeview");
+const SORTABLE_TREEVIEW = Symbol.for("sortable-treeview");
 var rn = Object.defineProperty, Ne = Object.getOwnPropertySymbols, vt = Object.prototype.hasOwnProperty, bt = Object.prototype.propertyIsEnumerable, mt = (e, t, n) => t in e ? rn(e, t, {
 	enumerable: !0,
 	configurable: !0,
