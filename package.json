@@ -1,31 +1,35 @@
 {
-	"name": "evo-laravel-sortable-treeview",
-	"version": "1.1.1",
-	"description": "",
-	"main": "dist/evo-laravel-sortable-treeview.cjs",
-	"module": "dist/evo-laravel-sortable-treeview.js",
-	"type": "module",
-	"scripts": {
-		"build": "vite build"
-	},
-	"peerDependencies": {
-		"@evomark/vue-forward-slots": "^6.2.1",
-		"@inertiajs/vue3": "^2.0.0",
-		"@vueuse/core": "^13.0.0",
-		"axios": "^1.8.0",
-		"lodash-es": "^4.0.0",
-		"vue-draggable-plus": "^0.6.0",
-		"vue3-icon": "^3.0.0",
-		"vuetify": "^3.9.0"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"devDependencies": {
-		"@mdi/js": "^7.4.47",
-		"@vitejs/plugin-vue": "^6.0.1",
-		"@vueuse/core": "^13.9.0",
-		"vite": "npm:rolldown-vite@^7.1.9",
-		"vite-plugin-lib-inject-css": "^2.2.2"
-	}
+  "name": "evo-laravel-sortable-treeview",
+  "version": "1.1.1",
+  "description": "",
+  "main": "dist/evo-laravel-sortable-treeview.cjs",
+  "module": "dist/evo-laravel-sortable-treeview.js",
+  "exports": {
+    ".": "./dist/evo-laravel-sortable-treeview.js",
+    "./style": "./dist/evo-laravel-sortable-treeview.css"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "@evomark/vue-forward-slots": "^6.2.1",
+    "@inertiajs/vue3": "^2.0.0",
+    "@vueuse/core": "^13.0.0",
+    "axios": "^1.8.0",
+    "lodash-es": "^4.0.0",
+    "vue-draggable-plus": "^0.6.0",
+    "vue3-icon": "^3.0.0",
+    "vuetify": "^3.9.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@mdi/js": "^7.4.47",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vueuse/core": "^13.9.0",
+    "vite": "npm:rolldown-vite@^7.1.9",
+    "vuetify": "^3.10.0"
+  }
 }
