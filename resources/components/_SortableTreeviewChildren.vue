@@ -17,9 +17,10 @@
 
 <script setup>
 import { inject, computed } from "vue";
-import { VueDraggable } from "vue-draggable-plus";
-import SortableTreeviewItem from "./_SortableTreeviewItem.vue";
 import { SORTABLE_TREEVIEW } from "./keys";
+import { VueDraggable } from "vue-draggable-plus";
+import { VExpandTransition } from "vuetify/components";
+import SortableTreeviewItem from "./_SortableTreeviewItem.vue";
 
 defineOptions({
 	name: "EvoSortableTreeviewChildren"

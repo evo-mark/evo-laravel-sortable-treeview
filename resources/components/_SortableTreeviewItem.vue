@@ -54,15 +54,16 @@
 </template>
 
 <script setup>
-import { useId, inject, useTemplateRef, computed, ref, watch } from "vue";
-import { syncRef } from "@vueuse/core";
-import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
-import { ForwardSlots } from "@evomark/vue-forward-slots";
-import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
-import { SORTABLE_TREEVIEW } from "./keys";
 import SvgIcon from "vue3-icon";
+import { syncRef } from "@vueuse/core";
+import { VBtn } from "vuetify/components";
+import { SORTABLE_TREEVIEW } from "./keys";
 import { useElementSize } from "@vueuse/core";
 import { useApiSync } from "../composables/useApiSync";
+import { ForwardSlots } from "@evomark/vue-forward-slots";
+import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
+import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
+import { useId, inject, useTemplateRef, computed, ref, watch } from "vue";
 
 defineOptions({
 	name: "EvoSortableTreeviewItem",
