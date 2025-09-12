@@ -1,24 +1,25 @@
 {
-    "name": "evo-mark/evo-laravel-sortable-treeview",
-    "description": "Sortable Treeview Laravel/Inertia websites",
-    "type": "library",
-    "license": "BUSL-1.1",
-    "authors": [
-        {
-            "name": "Craig Riley",
-            "email": "c.riley@evomark.co.uk"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "EvoMark\\EvoLaravelSortableTreeview\\": "src"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "EvoMark\\EvoLaravelSortableTreeview\\SortableTreeviewProvider"
-            ]
-        }
-    }
+	"name": "evo-mark/evo-laravel-sortable-treeview",
+	"description": "Sortable Treeview Laravel/Inertia websites",
+	"type": "library",
+	"license": "BUSL-1.1",
+	"authors": [
+		{
+			"name": "Craig Riley",
+			"email": "c.riley@evomark.co.uk"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"EvoMark\\EvoLaravelSortableTreeview\\": "src"
+		}
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"EvoMark\\EvoLaravelSortableTreeview\\SortableTreeviewProvider"
+			]
+		}
+	},
+	"version": "1.1.1"
 }
