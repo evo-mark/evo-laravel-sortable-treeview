@@ -8,7 +8,7 @@ function wrapVuetifyCssInLayer() {
     generateBundle(options, bundle) {
       for (const [fileName, chunk] of Object.entries(bundle)) {
         if (fileName.endsWith(".css") && chunk.type === "asset") {
-          chunk.source = `@layer vuetify { @layer components {\n${chunk.source}\n}}`;
+          chunk.source = `@layer vuetify-components {\n${chunk.source}\n}`;
         }
       }
     },
@@ -28,7 +28,7 @@ export default defineConfig({
         "vuetify",
         "@evomark/vue-forward-slots",
         "@inertiajs/vue3",
-        "lodash-es",
+        "es-toolkit",
         "axios",
         "@vueuse/core",
       ],
