@@ -1,6 +1,7 @@
 import axios from "axios";
 import { watch, nextTick, computed, ref } from "vue";
-import { reduce, isEqual, cloneDeep } from "lodash-es";
+import { isEqual, cloneDeep } from "es-toolkit";
+import { reduce } from "es-toolkit/compat";
 import { refAutoReset, watchPausable } from "@vueuse/core";
 
 const getChangedFields = (newObj, oldObj) => {

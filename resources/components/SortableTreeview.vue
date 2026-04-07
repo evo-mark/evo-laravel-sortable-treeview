@@ -27,7 +27,7 @@ import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { usePage } from "@inertiajs/vue3";
 import { useId, provide, computed, ref, watch } from "vue";
 import { SORTABLE_TREEVIEW } from "./keys";
-import { pick } from "lodash-es";
+import { pick } from "es-toolkit";
 import axios from "axios";
 
 defineOptions({

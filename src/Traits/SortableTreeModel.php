@@ -12,29 +12,39 @@ trait SortableTreeModel
 {
     protected array $descendantsWith = [];
 
+    protected function getParentColumn(): string
+    {
+        return "parent_id";
+    }
+
+    protected function getSortOrderColumn(): string
+    {
+        return "sort_order";
+    }
+
     public function descendants(): HasMany
     {
-        return $this->hasMany(static::class, 'parent_id')->orderBy('sort_order')->with('descendants', ...$this->descendantsWith);
+        return $this->hasMany(static::class, $this->getParentColumn())->orderBy($this->getSortOrderColumn())->with('descendants', ...$this->descendantsWith);
     }
 
     public function directDescendants(): HasMany
     {
-        $relation = $this->hasMany(static::class, 'parent_id');
+        $relation = $this->hasMany(static::class, $this->getParentColumn());
 
         if (count($this->descendantsWith) > 0) {
             $relation->with(...$this->descendantsWith);
         }
 
-        return $relation->orderBy('sort_order');
+        return $relation->orderBy($this->getSortOrderColumn());
     }
 
     public function scopeRoot(): Builder
     {
-        return $this->whereNull('parent_id');
+        return $this->whereNull($this->getParentColumn());
     }
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(static::class, 'parent_id', 'id');
+        return $this->belongsTo(static::class, $this->getParentColumn(), 'id');
     }
 }

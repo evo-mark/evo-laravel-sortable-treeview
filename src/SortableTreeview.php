@@ -6,6 +6,8 @@ namespace EvoMark\EvoLaravelSortableTreeview;
 
 use Exception;
 use TypeError;
+use ArrayAccess;
+use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -23,10 +25,12 @@ class SortableTreeview
     protected array $headers;
     protected Builder $query;
 
-    protected Collection $wheres;
-    protected Collection $whereNots;
-    protected Collection $whereIns;
-    protected Collection $whereNotIns;
+    protected string $sortOrderColumn = "sort_order";
+
+    /**
+     * Contains all eloquent builder queries that will be proxied
+     */
+    protected Collection $eloquent;
 
     protected Collection $withRelations;
     protected Collection $countRelations;
@@ -39,10 +43,7 @@ class SortableTreeview
     protected function __construct(
         protected string $model,
     ) {
-        $this->wheres = collect([]);
-        $this->whereNots = collect([]);
-        $this->whereIns = collect([]);
-        $this->whereNotIns = collect([]);
+        $this->eloquent = collect([]);
         $this->withRelations = collect([]);
         $this->countRelations = collect([]);
     }
@@ -53,8 +54,9 @@ class SortableTreeview
     public static function for(string $model): static
     {
         static::validateModel($model);
+        $instance = new static($model);
 
-        return new static($model);
+        return $instance;
     }
 
     public static function validateModel(string $model): void
@@ -75,80 +77,22 @@ class SortableTreeview
             throw new Exception($table . " is not a valid table");
         }
 
-        foreach (["sort_order", "parent_id"] as $column) {
-            if (!Schema::hasColumn($table, $column)) {
-                throw new Exception($table . " is missing the column " . $column);
-            }
-        }
-
         if (in_array(SortableTreeModel::class, class_uses($model)) === false) {
             throw new Exception($model . " is not using the SortableTreeModel trait");
         }
     }
 
+    public function setSortOrderColumn(string $sortOrderColumn)
+    {
+        $this->sortOrderColumn = $sortOrderColumn;
+
+
+        return $this;
+    }
+
     public function setQuery(Builder $query): static
     {
         $this->query = $query;
-
-        return $this;
-    }
-
-    /**
-     * Proxy for \Illuminate\Database\Eloquent\Builder::where
-     *
-     * @param  mixed ...$args
-     * @return SortableTreeview An instance of this class
-     *
-     * @see \Illuminate\Database\Eloquent\Builder::where
-     */
-    public function where(...$args): static
-    {
-        $this->wheres->push($args);
-
-        return $this;
-    }
-
-    /**
-     * Proxy for \Illuminate\Database\Eloquent\Builder::whereNot
-     *
-     * @param  mixed ...$args
-     * @return SortableTreeview An instance of this class
-     *
-     * @see \Illuminate\Database\Eloquent\Builder::whereNot
-     */
-    public function whereNot(...$args): static
-    {
-        $this->whereNots->push($args);
-
-        return $this;
-    }
-
-    /**
-     * Proxy for \Illuminate\Database\Eloquent\Builder::whereIn
-     *
-     * @param  mixed ...$args
-     * @return SortableTreeview An instance of this class
-     *
-     * @see \Illuminate\Database\Eloquent\Builder::whereIn
-     */
-    public function whereIn(...$args): static
-    {
-        $this->whereIns->push($args);
-
-        return $this;
-    }
-
-    /**
-     * Proxy for \Illuminate\Database\Eloquent\Builder::whereNotIn
-     *
-     * @param  mixed ...$args
-     * @return SortableTreeview An instance of this class
-     *
-     * @see \Illuminate\Database\Eloquent\Builder::whereNotIn
-     */
-    public function whereNotIn(...$args): static
-    {
-        $this->whereNotIns->push($args);
 
         return $this;
     }
@@ -238,6 +182,14 @@ class SortableTreeview
 
     public function get()
     {
+        $instance = new $this->model;
+        $table = $instance->getTable();
+
+        if (!Schema::hasColumn($table, $this->sortOrderColumn)) {
+            throw new Exception($table . " is missing the column " . $this->sortOrderColumn);
+        }
+
+
         $query = !empty($this->query) ? $this->query->root() : $this->model::root();
 
         if ($this->config['lazy'] === true) {
@@ -254,7 +206,7 @@ class SortableTreeview
             $query->withCount($this->countRelations->toArray());
         }
 
-        $results = $query->orderBy('sort_order')->get();
+        $results = $query->orderBy($this->sortOrderColumn)->get();
         $collection = $this->collection::collection($results);
 
         return $collection->additional([
@@ -264,10 +216,145 @@ class SortableTreeview
         ]);
     }
 
-    private function setWhereConstraints(Builder $query): void
+    private function setWhereConstraints(Builder $query): Builder
     {
-        $items = collect(['where' => $this->wheres, 'whereNot' => $this->whereNots, 'whereIn' => $this->whereIns, 'whereNotIn' => $this->whereNotIns]);
+        $this->eloquent->each(function (Collection $constraints, string $method) use ($query) {
+            $constraints->each(function (array $arguments) use ($query, $method) {
+                $query->{$method}(...$arguments);
+            });
+        });
 
-        $items->each(fn($collection, $method) => $collection->each(fn($constraint) => $query->{$method}(...$constraint)));
+        return $query;
+    }
+
+    /***********************************
+     * MAGIC METHODS
+     ***********************************/
+
+    /**
+     * @throws BadMethodCallException
+     */
+    public function __call(string $name, array $arguments): static
+    {
+        $validMethods = [
+            "whereRaw",
+            "orWhereRaw",
+            "havingRaw",
+            "orHavingRaw",
+            "where",
+            "orWhere",
+            "whereNot",
+            "orWhereNot",
+            "whereAny",
+            "orWhereAny",
+            "whereAll",
+            "orWhereAll",
+            "whereNone",
+            "orWhereNone",
+            "whereIn",
+            "whereNotIn",
+            "whereNotInStrict",
+            "orWhereIn",
+            "orWhereNotIn",
+            "whereIntegerInRaw",
+            "orWhereIntegerInRaw",
+            "whereIntegerNotInRaw",
+            "orWhereIntegerNotInRaw",
+            "whereJsonContains",
+            "whereJsonDoesntContain",
+            "whereJsonContainsKey",
+            "whereJsonDoesntContainKey",
+            "whereJsonLength",
+            "whereLike",
+            "orWhereLike",
+            "whereNotLike",
+            "orWhereNotLike",
+            "whereBetween",
+            "orWhereBetween",
+            "whereNotBetween",
+            "orWhereNotBetween",
+            "whereBetweenColumns",
+            "whereNotBetweenColumns",
+            "orWhereBetweenColumns",
+            "orWhereNotBetweenColumns",
+            "whereValueBetween",
+            "whereValueNotBetween",
+            "orWhereValueBetween",
+            "orWhereValueNotBetween",
+            "whereNull",
+            "whereNotNull",
+            "orWhereNull",
+            "orWhereNotNull",
+            "whereDate",
+            "orWhereDate",
+            "whereMonth",
+            "orWhereMonth",
+            "whereDay",
+            "orWhereDay",
+            "whereYear",
+            "orWhereYear",
+            "whereTime",
+            "orWhereTime",
+            "wherePast",
+            "whereFuture",
+            "whereToday",
+            "whereBeforeToday",
+            "whereAfterToday",
+            "whereNowOrPast",
+            "whereNowOrFuture",
+            "whereTodayOrBefore",
+            "whereTodayOrAfter",
+            "whereColumn",
+            "orWhereColumn",
+            "whereExists",
+            "orWhereExists",
+            "whereNotExists",
+            "orWhereNotExists",
+            "whereFullText",
+            "orWhereFullText",
+            "whereBelongsTo",
+            "wherePivot",
+            "wherePivotIn",
+            "wherePivotNotIn",
+            "wherePivotBetween",
+            "wherePivotNotBetween",
+            "wherePivotNull",
+            "wherePivotNotNull",
+            "whereHas",
+            "orWhereHas",
+            "whereAttachedTo",
+            "whereRelation",
+            "orWhereRelation",
+            "whereMorphRelation",
+            "orWhereMorphRelation",
+            "doesntHave",
+            "orDoesntHave",
+            "whereDoesntHave",
+            "orWhereDoesntHave",
+            "whereHasMorph",
+            "whereDoesntHaveMorph",
+            "whereMorphedTo",
+            "whereNotMorphedTo",
+            "when",
+            "whereRowValues",
+            "orWhereRowValues",
+            "whereNested",
+            "whereJsonOverlaps",
+            "orWhereJsonOverlaps",
+            "whereJsonDoesntOverlap",
+            "orWhereJsonDoesntOverlap",
+        ];
+
+        if (in_array($name, $validMethods) === false) {
+            throw new BadMethodCallException(sprintf("Method %s::%s does not exist", static::class, $name));
+        }
+
+        if ($this->eloquent->has($name) === false) {
+            $this->eloquent->put($name, collect());
+        }
+
+        $this->eloquent[$name]->push($arguments);
+
+        return $this;
     }
 }
