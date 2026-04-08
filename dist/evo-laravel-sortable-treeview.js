@@ -3328,37 +3328,37 @@ function No(e, t = jo, n) {
 //#endregion
 //#region resources/composables/useApiSync.js
 var Po = (e, t) => No(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Fo = (e, t = {}) => {
-	let n = t.updateItemRoute, r = t.updateItemMethod, i = t.itemValue, o = a(() => Te(e())), s = k(), c = a(() => Te(s.value)), l = be(null, 4e3), u = (e) => we({
-		url: n,
-		method: r,
+	let n = t.disableUpdate === !0, r = t.updateItemRoute, i = t.updateItemMethod, o = t.itemValue, s = a(() => Te(e())), c = k(), l = a(() => Te(c.value)), u = be(null, 4e3), d = (e) => n ? Promise.resolve() : we({
+		url: r,
+		method: i,
 		data: e
 	}).then((e) => {
 		t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(e.data);
 	}).catch((e) => {
-		throw l.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
+		throw u.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
 	});
-	ge(o, (e, t) => {
+	ge(s, (e, t) => {
 		if (t !== void 0) {
 			let n = Po(e, t);
-			Object.keys(n).length > 0 && (n[i] = e[i], u(n));
+			Object.keys(n).length > 0 && (n[o] = e[o], d(n));
 		}
-		s.value = e;
+		c.value = e;
 	}, {
 		immediate: !0,
 		deep: !0
 	});
-	let { pause: d, resume: f } = Ce(c, (e, t) => {
+	let { pause: f, resume: p } = Ce(l, (e, t) => {
 		if (t !== void 0) {
 			let n = Po(e, t);
-			Object.keys(n).length > 0 && (n[i] = e[i], u(n).catch(async () => {
-				d(), await x(), s.value = t, await x(), f();
+			Object.keys(n).length > 0 && (n[o] = e[o], d(n).catch(async () => {
+				f(), await x(), c.value = t, await x(), p();
 			}));
 		}
 	}, { deep: !0 });
 	return {
-		data: s,
-		error: l,
-		update: u
+		data: c,
+		error: u,
+		update: d
 	};
 }, Io = "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z", Lo = "M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z", Ro = { class: "evo-sortable-treeview__item" }, zo = { class: "evo-sortable-treeview__item-content" }, Bo = {
 	ref: "item",
