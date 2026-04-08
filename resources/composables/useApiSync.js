@@ -18,6 +18,8 @@ const getChangedFields = (newObj, oldObj) => {
 };
 
 export const useApiSync = (source, config = {}) => {
+	const disableUpdate = config.disableUpdate === true;
+
 	const updateRoute = config.updateItemRoute;
 	const updateMethod = config.updateItemMethod;
 	const idField = config.itemValue;
@@ -28,6 +30,10 @@ export const useApiSync = (source, config = {}) => {
 	const error = refAutoReset(null, 4000);
 
 	const onUpdate = (data) => {
+		if (disableUpdate) {
+			return Promise.resolve();
+		}
+
 		return axios({
 			url: updateRoute,
 			method: updateMethod,

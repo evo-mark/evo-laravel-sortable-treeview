@@ -155,6 +155,7 @@ class SortableTreeview
         $config['updateSortOrderMethod'] ??= "put";
         $config['updateItemRoute'] ??= "";
         $config['updateItemMethod'] ??= "PATCH";
+        $config['disableUpdate'] ??= false;
 
         $this->config = $config;
 
