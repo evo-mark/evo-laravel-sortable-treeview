@@ -21,6 +21,7 @@ export const useApiSync = (source, config = {}) => {
 	const disableUpdate = config.disableUpdate === true;
 	const useInertia = config.useInertia ?? false;
 	const router = config.router;
+	const reload = config.reload ?? undefined;
 
 	const updateRoute = config.updateItemRoute;
 	const updateMethod = config.updateItemMethod;
@@ -44,6 +45,7 @@ export const useApiSync = (source, config = {}) => {
 					perserveState: true,
 					async: true,
 					showProgress: false,
+					only: reload,
 					data,
 					onSuccess() {
 						if (config.onSuccess && typeof config.onSuccess === "function") {

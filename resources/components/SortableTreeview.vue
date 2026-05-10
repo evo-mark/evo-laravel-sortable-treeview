@@ -49,6 +49,10 @@ const props = defineProps({
 	useInertia: {
 		type: Boolean,
 		default: false
+	},
+	reload: {
+		type: Array,
+		default: () => []
 	}
 });
 
@@ -77,7 +81,7 @@ const columnMaximums = computed(() => {
 provide(SORTABLE_TREEVIEW, {
 	group: id,
 	config,
-	treeProps: computed(() => pick(props, ["itemChildren", "itemChildrenCount", "itemTitle", "itemValue", "useInertia", "router"])),
+	treeProps: computed(() => pick(props, ["itemChildren", "itemChildrenCount", "itemTitle", "itemValue", "useInertia", "router", "reload", "model"])),
 	registerItem: (id, widthsReactive) => {
 		itemWidths.value.set(id, widthsReactive);
 	},

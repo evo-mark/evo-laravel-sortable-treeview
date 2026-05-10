@@ -101,7 +101,12 @@ const { data, error } = useApiSync(() => props.item, {
 		context.emit("error", data);
 	},
 	useInertia: context.treeProps.value.useInertia,
-	router: context.treeProps.value.router ?? router
+	router: context.treeProps.value.router ?? router,
+	reload: context.treeProps.value.reload ? 
+		context.treeProps.value.reload : 
+		typeof context.treeProps.value.model === "string" ? 
+			[context.treeProps.value.model] : 
+			undefined 
 });
 
 /* *********************************************************
