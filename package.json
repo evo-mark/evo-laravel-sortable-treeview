@@ -6,7 +6,8 @@
 	"module": "dist/evo-laravel-sortable-treeview.js",
 	"exports": {
 		".": "./dist/evo-laravel-sortable-treeview.js",
-		"./style": "./dist/evo-laravel-sortable-treeview.css"
+		"./style": "./dist/evo-laravel-sortable-treeview.css",
+		"./dev": "./resources/components/index.js"
 	},
 	"type": "module",
 	"scripts": {
