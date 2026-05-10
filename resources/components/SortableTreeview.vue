@@ -52,7 +52,7 @@ const props = defineProps({
 	},
 	reload: {
 		type: Array,
-		default: () => []
+		default: null
 	}
 });
 

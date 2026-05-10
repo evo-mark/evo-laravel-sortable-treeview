@@ -37,7 +37,7 @@
 					<slot name="item.append-title" :item="props.item"></slot>
 				</div>
 			</div>
-			<div class="d-flex align-center flex" ref="columns">
+			<div class="d-flex align-center flex items-center" ref="columns">
 				<slot name="item.columns" :item="data"></slot>
 			</div>
 		</div>
