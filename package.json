@@ -1,6 +1,6 @@
 {
 	"name": "evo-laravel-sortable-treeview",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "",
 	"main": "dist/evo-laravel-sortable-treeview.cjs",
 	"module": "dist/evo-laravel-sortable-treeview.js",

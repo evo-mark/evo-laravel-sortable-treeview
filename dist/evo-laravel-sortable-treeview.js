@@ -3328,35 +3328,30 @@ function Po(e, t = Mo, n) {
 //#endregion
 //#region resources/composables/useApiSync.js
 var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = (e, t = {}) => {
-	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.updateItemRoute, s = t.updateItemMethod, c = t.itemValue, l = a(() => Te(e())), u = k(), d = a(() => Te(u.value)), f = be(null, 4e3), p = (e) => {
-		if (n) return Promise.resolve();
-		if (r) {
-			i.visit(o, {
-				method: s,
-				preserveScroll: !0,
-				perserveState: !0,
-				async: !0,
-				showProgress: !1,
-				data: e,
-				onSuccess() {
-					t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess();
-				},
-				onError(e) {
-					throw f.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), Error(e);
-				}
-			});
-			return;
-		}
-		return we({
-			url: o,
+	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.updateItemRoute, s = t.updateItemMethod, c = t.itemValue, l = a(() => Te(e())), u = k(), d = a(() => Te(u.value)), f = be(null, 4e3), p = (e) => n ? Promise.resolve() : r ? new Promise((n, r) => {
+		i.visit(o, {
 			method: s,
-			data: e
-		}).then((e) => {
-			t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(e.data);
-		}).catch((e) => {
-			throw f.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
+			preserveScroll: !0,
+			perserveState: !0,
+			async: !0,
+			showProgress: !1,
+			data: e,
+			onSuccess() {
+				t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(), n();
+			},
+			onError(e) {
+				f.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), r(e);
+			}
 		});
-	};
+	}) : we({
+		url: o,
+		method: s,
+		data: e
+	}).then((e) => {
+		t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(e.data);
+	}).catch((e) => {
+		throw f.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
+	});
 	ge(l, (e, t) => {
 		if (t !== void 0) {
 			let n = Fo(e, t);
