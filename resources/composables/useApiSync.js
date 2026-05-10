@@ -39,6 +39,10 @@ export const useApiSync = (source, config = {}) => {
 		if (useInertia) {
 			router.visit(updateRoute, {
 				method: updateMethod,
+				preserveScroll: true,
+				perserveState: true,
+				async: true,
+				showProgress: false,
 				data,
 				onSuccess() {
 					if (config.onSuccess && typeof config.onSuccess === "function") {
