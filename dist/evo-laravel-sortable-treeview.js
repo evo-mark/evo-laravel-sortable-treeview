@@ -3332,7 +3332,7 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 		i.visit(s, {
 			method: c,
 			preserveScroll: !0,
-			perserveState: !0,
+			preserveState: !0,
 			async: !0,
 			showProgress: !1,
 			only: o,
