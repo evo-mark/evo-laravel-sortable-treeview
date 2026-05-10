@@ -3328,52 +3328,53 @@ function Po(e, t = Mo, n) {
 //#endregion
 //#region resources/composables/useApiSync.js
 var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = (e, t = {}) => {
-	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.updateItemRoute, s = t.updateItemMethod, c = t.itemValue, l = a(() => Te(e())), u = k(), d = a(() => Te(u.value)), f = be(null, 4e3), p = (e) => n ? Promise.resolve() : r ? new Promise((n, r) => {
-		i.visit(o, {
-			method: s,
+	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.reload ?? void 0, s = t.updateItemRoute, c = t.updateItemMethod, l = t.itemValue, u = a(() => Te(e())), d = k(), f = a(() => Te(d.value)), p = be(null, 4e3), m = (e) => n ? Promise.resolve() : r ? new Promise((n, r) => {
+		i.visit(s, {
+			method: c,
 			preserveScroll: !0,
 			perserveState: !0,
 			async: !0,
 			showProgress: !1,
+			only: o,
 			data: e,
 			onSuccess() {
 				t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(), n();
 			},
 			onError(e) {
-				f.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), r(e);
+				p.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), r(e);
 			}
 		});
 	}) : we({
-		url: o,
-		method: s,
+		url: s,
+		method: c,
 		data: e
 	}).then((e) => {
 		t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(e.data);
 	}).catch((e) => {
-		throw f.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
+		throw p.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
 	});
-	ge(l, (e, t) => {
+	ge(u, (e, t) => {
 		if (t !== void 0) {
 			let n = Fo(e, t);
-			Object.keys(n).length > 0 && (n[c] = e[c], p(n));
+			Object.keys(n).length > 0 && (n[l] = e[l], m(n));
 		}
-		u.value = e;
+		d.value = e;
 	}, {
 		immediate: !0,
 		deep: !0
 	});
-	let { pause: m, resume: h } = Ce(d, (e, t) => {
+	let { pause: h, resume: g } = Ce(f, (e, t) => {
 		if (t !== void 0) {
 			let n = Fo(e, t);
-			Object.keys(n).length > 0 && (n[c] = e[c], p(n).catch(async () => {
-				m(), await x(), u.value = t, await x(), h();
+			Object.keys(n).length > 0 && (n[l] = e[l], m(n).catch(async () => {
+				h(), await x(), d.value = t, await x(), g();
 			}));
 		}
 	}, { deep: !0 });
 	return {
-		data: u,
-		error: f,
-		update: p
+		data: d,
+		error: p,
+		update: m
 	};
 }, Lo = "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z", Ro = "M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z", zo = { class: "evo-sortable-treeview__item" }, Bo = { class: "evo-sortable-treeview__item-content" }, Vo = {
 	ref: "item",
@@ -3403,7 +3404,8 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 				i.emit("error", e);
 			},
 			useInertia: i.treeProps.value.useInertia,
-			router: i.treeProps.value.router ?? ke
+			router: i.treeProps.value.router ?? ke,
+			reload: i.treeProps.value.reload ? i.treeProps.value.reload : typeof i.treeProps.value.model == "string" ? [i.treeProps.value.model] : void 0
 		}), y = k([]), { width: b } = Se(r);
 		ge(b, (e) => {
 			if (!r.value) return [];
@@ -3555,6 +3557,10 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 		useInertia: {
 			type: Boolean,
 			default: !1
+		},
+		reload: {
+			type: Array,
+			default: () => []
 		}
 	},
 	emits: [
@@ -3583,7 +3589,9 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 				"itemTitle",
 				"itemValue",
 				"useInertia",
-				"router"
+				"router",
+				"reload",
+				"model"
 			])),
 			registerItem: (e, t) => {
 				h.value.set(e, t);
