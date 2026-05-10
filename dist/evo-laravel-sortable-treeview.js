@@ -3333,6 +3333,10 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 		if (r) {
 			i.visit(o, {
 				method: s,
+				preserveScroll: !0,
+				perserveState: !0,
+				async: !0,
+				showProgress: !1,
 				data: e,
 				onSuccess() {
 					t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess();
