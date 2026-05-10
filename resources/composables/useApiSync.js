@@ -37,27 +37,29 @@ export const useApiSync = (source, config = {}) => {
 		}
 
 		if (useInertia) {
-			router.visit(updateRoute, {
-				method: updateMethod,
-				preserveScroll: true,
-				perserveState: true,
-				async: true,
-				showProgress: false,
-				data,
-				onSuccess() {
-					if (config.onSuccess && typeof config.onSuccess === "function") {
-						config.onSuccess();
+			return new Promise((resolve,reject) => {
+				router.visit(updateRoute, {
+					method: updateMethod,
+					preserveScroll: true,
+					perserveState: true,
+					async: true,
+					showProgress: false,
+					data,
+					onSuccess() {
+						if (config.onSuccess && typeof config.onSuccess === "function") {
+							config.onSuccess();
+						}
+						resolve();
+					},
+					onError(errors) {
+						error.value = errors?.[0];
+						if (config.onError && typeof config.onError === "function") {
+							config.onError(errors);
+						}
+						reject(errors);
 					}
-				},
-				onError(errors) {
-					error.value = errors?.[0];
-					if (config.onError && typeof config.onError === "function") {
-						config.onError(errors);
-					}
-					throw new Error(errors);
-				}
-			});
-			return;
+				});
+			})
 		}
 
 		return axios({
