@@ -42,7 +42,7 @@ export const useApiSync = (source, config = {}) => {
 				router.visit(updateRoute, {
 					method: updateMethod,
 					preserveScroll: true,
-					perserveState: true,
+					preserveState: true,
 					async: true,
 					showProgress: false,
 					only: reload,
