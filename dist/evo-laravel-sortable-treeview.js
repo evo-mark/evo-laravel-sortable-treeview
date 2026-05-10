@@ -3380,7 +3380,7 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 	ref: "item",
 	class: "evo-sortable-treeview__actions"
 }, Ho = { class: "evo-sortable-treeview__action-drag" }, Uo = { class: "evo-sortable-treeview__action-title" }, Wo = {
-	class: "d-flex align-center flex",
+	class: "d-flex align-center flex items-center",
 	ref: "columns"
 }, Go = /* @__PURE__ */ Object.assign({ name: "EvoSortableTreeviewItem" }, {
 	__name: "_SortableTreeviewItem",
@@ -3560,7 +3560,7 @@ var Fo = (e, t) => Po(e, (e, n, r) => (Ee(n, t[r]) || (e[r] = n), e), {}), Io = 
 		},
 		reload: {
 			type: Array,
-			default: () => []
+			default: null
 		}
 	},
 	emits: [
