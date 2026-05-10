@@ -19,6 +19,8 @@ const getChangedFields = (newObj, oldObj) => {
 
 export const useApiSync = (source, config = {}) => {
 	const disableUpdate = config.disableUpdate === true;
+	const useInertia = config.useInertia ?? false;
+	const router = config.router;
 
 	const updateRoute = config.updateItemRoute;
 	const updateMethod = config.updateItemMethod;
@@ -32,6 +34,26 @@ export const useApiSync = (source, config = {}) => {
 	const onUpdate = (data) => {
 		if (disableUpdate) {
 			return Promise.resolve();
+		}
+
+		if (useInertia) {
+			router.visit(updateRoute, {
+				method: updateMethod,
+				data,
+				onSuccess() {
+					if (config.onSuccess && typeof config.onSuccess === "function") {
+						config.onSuccess();
+					}
+				},
+				onError(errors) {
+					error.value = errors?.[0];
+					if (config.onError && typeof config.onError === "function") {
+						config.onError(errors);
+					}
+					throw new Error(errors);
+				}
+			});
+			return;
 		}
 
 		return axios({

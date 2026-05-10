@@ -64,6 +64,7 @@ import { ForwardSlots } from "@evomark/vue-forward-slots";
 import { mdiChevronRight, mdiDragVertical } from "@mdi/js";
 import SortableTreeviewChildren from "./_SortableTreeviewChildren.vue";
 import { useId, inject, useTemplateRef, computed, ref, watch } from "vue";
+import { router } from "@inertiajs/vue3";
 
 defineOptions({
 	name: "EvoSortableTreeviewItem",
@@ -99,6 +100,8 @@ const { data, error } = useApiSync(() => props.item, {
 	onError: (data) => {
 		context.emit("error", data);
 	},
+	useInertia: context.treeProps.value.useInertia,
+	router: context.treeProps.value.router ?? router
 });
 
 /* *********************************************************
