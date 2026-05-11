@@ -22,11 +22,13 @@ export const useApiSync = (source, config = {}) => {
 	const useInertia = config.useInertia ?? false;
 	const router = config.router;
 	const reload = config.reload ?? undefined;
-	const debounceTime = config.debounce ?? 300;
+	const debounceTime = config.debounce ?? 500;
 
 	const updateRoute = config.updateItemRoute;
 	const updateMethod = config.updateItemMethod;
 	const idField = config.itemValue;
+	const isImmediate = ref(false);
+	const setImmediate = (state = true) => (isImmediate.value = state); 
 
 	const cloned = computed(() => cloneDeep(source()));
 	const modelValue = ref();
@@ -84,18 +86,11 @@ export const useApiSync = (source, config = {}) => {
 			});
 	};
 
+	// Send changes to the source to the local ref
 	watch(
 		cloned,
-		(newValue, oldValue) => {
-			if (oldValue !== undefined) {
-				const diff = getChangedFields(newValue, oldValue);
-				if (Object.keys(diff).length > 0) {
-					diff[idField] = newValue[idField];
-					onUpdate(diff);
-				}
-			}
-
-			modelValue.value = newValue;
+		(v) => {
+			modelValue.value = v;
 		},
 		{
 			immediate: true,
@@ -133,6 +128,9 @@ export const useApiSync = (source, config = {}) => {
 
 				pendingDiff[idField] = newValue[idField];
 				debouncedUpdate();
+				if (isImmediate.value) {
+					debouncedUpdate.flush();
+				}
 			}
 		},
 		{
@@ -143,6 +141,7 @@ export const useApiSync = (source, config = {}) => {
 	return {
 		data: modelValue,
 		error,
-		update: onUpdate
+		update: onUpdate,
+		setImmediate
 	};
 };
