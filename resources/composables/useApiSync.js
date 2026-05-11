@@ -1,6 +1,6 @@
 import axios from "axios";
 import { watch, nextTick, computed, ref } from "vue";
-import { isEqual, cloneDeep } from "es-toolkit";
+import { isEqual, cloneDeep, debounce, merge } from "es-toolkit";
 import { reduce } from "es-toolkit/compat";
 import { refAutoReset, watchPausable } from "@vueuse/core";
 
@@ -22,6 +22,7 @@ export const useApiSync = (source, config = {}) => {
 	const useInertia = config.useInertia ?? false;
 	const router = config.router;
 	const reload = config.reload ?? undefined;
+	const debounceTime = config.debounce ?? 300;
 
 	const updateRoute = config.updateItemRoute;
 	const updateMethod = config.updateItemMethod;
@@ -102,21 +103,36 @@ export const useApiSync = (source, config = {}) => {
 		}
 	);
 
+	let pendingDiff = {};
+	let previousValue = null;
+	const debouncedUpdate = debounce(async() => {
+		const diff = { ...pendingDiff };
+		pendingDiff = {};
+
+		try {
+			await onUpdate(diff);
+		} catch {
+			pause();
+			await nextTick();
+			modelValue.value = previousValue;
+			await nextTick();
+			resume();
+		}
+
+	}, debounceTime);
+
 	const { pause, resume } = watchPausable(
 		dataCloned,
 		(newValue, oldValue) => {
 			if (oldValue !== undefined) {
 				const diff = getChangedFields(newValue, oldValue);
-				if (Object.keys(diff).length > 0) {
-					diff[idField] = newValue[idField];
-					onUpdate(diff).catch(async () => {
-						pause();
-						await nextTick();
-						modelValue.value = oldValue;
-						await nextTick();
-						resume();
-					});
-				}
+				if (Object.keys(diff).length === 0) return;
+
+				previousValue = oldValue;
+				pendingDiff = merge(pendingDiff, diff);
+
+				pendingDiff[idField] = newValue[idField];
+				debouncedUpdate();
 			}
 		},
 		{
