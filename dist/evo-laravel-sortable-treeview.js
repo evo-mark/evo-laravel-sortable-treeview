@@ -3328,7 +3328,7 @@ function Io(e, t = Po, n) {
 //#endregion
 //#region resources/composables/useApiSync.js
 var Lo = (e, t) => Io(e, (e, n, r) => (De(n, t[r]) || (e[r] = n), e), {}), Ro = (e, t = {}) => {
-	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.reload ?? void 0, s = t.debounce ?? 300, c = t.updateItemRoute, l = t.updateItemMethod, u = t.itemValue, d = a(() => Te(e())), f = k(), p = a(() => Te(f.value)), m = be(null, 4e3), h = (e) => n ? Promise.resolve() : r ? new Promise((n, r) => {
+	let n = t.disableUpdate === !0, r = t.useInertia ?? !1, i = t.router, o = t.reload ?? void 0, s = t.debounce ?? 500, c = t.updateItemRoute, l = t.updateItemMethod, u = t.itemValue, d = k(!1), f = (e = !0) => d.value = e, p = a(() => Te(e())), m = k(), h = a(() => Te(m.value)), g = be(null, 4e3), _ = (e) => n ? Promise.resolve() : r ? new Promise((n, r) => {
 		i.visit(c, {
 			method: l,
 			preserveScroll: !0,
@@ -3341,7 +3341,7 @@ var Lo = (e, t) => Io(e, (e, n, r) => (De(n, t[r]) || (e[r] = n), e), {}), Ro = 
 				t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(), n();
 			},
 			onError(e) {
-				m.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), r(e);
+				g.value = e?.[0], t.onError && typeof t.onError == "function" && t.onError(e), r(e);
 			}
 		});
 	}) : we({
@@ -3351,37 +3351,34 @@ var Lo = (e, t) => Io(e, (e, n, r) => (De(n, t[r]) || (e[r] = n), e), {}), Ro = 
 	}).then((e) => {
 		t.onSuccess && typeof t.onSuccess == "function" && t.onSuccess(e.data);
 	}).catch((e) => {
-		throw m.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
+		throw g.value = e.response.data.message, t.onError && typeof t.onError == "function" && t.onError(e.response), Error(e);
 	});
-	ge(d, (e, t) => {
-		if (t !== void 0) {
-			let n = Lo(e, t);
-			Object.keys(n).length > 0 && (n[u] = e[u], h(n));
-		}
-		f.value = e;
+	ge(p, (e) => {
+		m.value = e;
 	}, {
 		immediate: !0,
 		deep: !0
 	});
-	let g = {}, _ = null, v = Ee(async () => {
-		let e = { ...g };
-		g = {};
+	let v = {}, y = null, b = Ee(async () => {
+		let e = { ...v };
+		v = {};
 		try {
-			await h(e);
+			await _(e);
 		} catch {
-			y(), await x(), f.value = _, await x(), b();
+			S(), await x(), m.value = y, await x(), C();
 		}
-	}, s), { pause: y, resume: b } = Ce(p, (e, t) => {
+	}, s), { pause: S, resume: C } = Ce(h, (e, t) => {
 		if (t !== void 0) {
 			let n = Lo(e, t);
 			if (Object.keys(n).length === 0) return;
-			_ = t, g = Oe(g, n), g[u] = e[u], v();
+			y = t, v = Oe(v, n), v[u] = e[u], b(), d.value && b.flush();
 		}
 	}, { deep: !0 });
 	return {
-		data: f,
-		error: m,
-		update: h
+		data: m,
+		error: g,
+		update: _,
+		setImmediate: f
 	};
 }, zo = "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z", Bo = "M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z", Vo = { class: "evo-sortable-treeview__item" }, Ho = { class: "evo-sortable-treeview__item-content" }, Uo = {
 	ref: "item",
